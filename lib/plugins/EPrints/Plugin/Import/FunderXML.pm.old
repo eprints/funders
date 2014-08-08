@@ -1,0 +1,140 @@
+=head1 NAME
+
+EPrints::Plugin::Import::FunderXML
+
+=head1 DESCRIPTION
+
+Support updating records based on identifiers in the source XML.
+
+=cut
+
+package EPrints::Plugin::Import::FunderXML;
+
+use strict;
+
+use base qw( EPrints::Plugin::Import::XML );
+
+sub new
+{
+	my( $class, %params ) = @_;
+
+	my $self = $class->SUPER::new(%params);
+
+	$self->{name} = "EPrints Funder XML";
+	$self->{visible} = "all";
+	$self->{produce} = [ 'list/funder' ];
+	$self->{accept} = [];
+
+	return $self;
+}
+
+sub epdata_to_dataobj
+{
+	my( $self, $dataset, $epdata ) = @_;
+
+	$self->lookup_funder_id($dataset, $epdata);
+
+	return $self->SUPER::epdata_to_dataobj($dataset, $epdata);
+}
+
+sub lookup_funder_id
+{
+	my ($self, $epdataset, $epdata) = @_;
+
+	my $repo = $self->repository;
+	my $funders = $repo->dataset('funder');
+	
+	my $funder;
+
+	# hard-coded disambiguation for Reading
+	my $funder_name = $epdata->{'name'};
+	if ($funder_name eq 'MRC')
+	{
+		$funder_name = 'Medical Research Council';
+	}
+	elsif ($funder_name eq 'NERC')
+	{
+		$funder_name = 'Natural Environment Research Council';
+	}
+	# US/UK
+	elsif ($funder_name eq 'Biochemical Society')
+	{
+		$epdata->{'int_funder_code'} = 'SP000023';
+	}
+
+	if (EPrints::Utils::is_set($epdata->{'int_funder_code'}))
+	{
+		$funder = $funders->search(
+			filters => [
+				{ meta_fields => ['int_funder_code'], value => $epdata->{'int_funder_code'}, },
+			],
+		)->item(0);
+	}
+
+	if (!defined $funder && EPrints::Utils::is_set($funder_name))
+	{
+		$funder = $funders->search(
+			filters => [
+				{ meta_fields => ['name'], value => $funder_name, match => 'EX', },
+			],
+		)->item(0);
+	}
+
+	if (!defined $funder && EPrints::Utils::is_set($funder_name))
+	{
+		my $results = $funders->search(
+			filters => [
+				{ meta_fields => ['alt_name'], value => $funder_name, match => 'EX', },
+			],
+		);
+		$funder = $results->item(0) if $results->count == 1;
+	}
+
+	if (!defined $funder && EPrints::Utils::is_set($epdata->{alt_name}))
+	{
+		foreach my $alt_name (@{$epdata->{alt_name}})
+		{
+			my $results = $funders->search(
+				filters => [
+					{ meta_fields => ['alt_name'], value => $alt_name, match => 'EX', },
+				],
+			);
+			$funder = $results->item(0), last if $results->count == 1;
+		}
+	}
+
+	if (defined $funder)
+	{
+		$epdata->{funderid} = $funder->id;
+		$epdata->{name} = $funder->value('name') if $funder->is_set('name');
+	}
+}
+1;
+
+=head1 COPYRIGHT
+
+=for COPYRIGHT BEGIN
+
+Copyright 2000-2011 University of Southampton.
+
+=for COPYRIGHT END
+
+=for LICENSE BEGIN
+
+This file is part of EPrints L<http://www.eprints.org/>.
+
+EPrints is free software: you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+EPrints is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with EPrints.  If not, see L<http://www.gnu.org/licenses/>.
+
+=for LICENSE END
+

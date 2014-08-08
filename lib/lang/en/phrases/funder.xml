@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE phrases SYSTEM "entities.dtd">
+<epp:phrases xmlns="http://www.w3.org/1999/xhtml" xmlns:epp="http://eprints.org/ep3/phrase" xmlns:epc="http://eprints.org/ep3/control">
+
+<epp:phrase id="datasetname_funder">Funders</epp:phrase>
+<epp:phrase id="datasethelp_funder">Research councils and other bodies that provide funding for research.</epp:phrase>
+
+<epp:phrase id="funder:workflow:stage:default:title">Details</epp:phrase>
+
+<epp:phrase id="funder_fieldname_funderid">Funder ID</epp:phrase>
+<epp:phrase id="funder_fieldname_datestamp">Datestamp</epp:phrase>
+<epp:phrase id="funder_fieldname_name">Name</epp:phrase>
+<epp:phrase id="funder_fieldname_alt_name">Alternate Names</epp:phrase>
+<epp:phrase id="funder_fieldname_open_access_policy">Open Access Policy URL</epp:phrase>
+<epp:phrase id="funder_fieldname_type">Type</epp:phrase>
+<epp:phrase id="funder_fieldname_sub_type">Sub-Type</epp:phrase>
+<epp:phrase id="funder_fieldname_geoname">Geoname</epp:phrase>
+<epp:phrase id="funder_fieldname_source">Source</epp:phrase>
+<epp:phrase id="funder_fieldname_database">Data Source</epp:phrase>
+
+<epp:phrase id="funder_fieldname_userid">Owner</epp:phrase>
+<epp:phrase id="funder_fieldname_identifier">Indentifier</epp:phrase>
+<epp:phrase id="funder_fieldname_parents">Parents</epp:phrase>
+<epp:phrase id="funder_fieldname_geoname_state">State</epp:phrase>
+<epp:phrase id="funder_fieldname_int_funder_code">Internal Funder Code</epp:phrase>
+
+<epp:phrase id="metapage_title_funding">Funding</epp:phrase>
+
+</epp:phrases>

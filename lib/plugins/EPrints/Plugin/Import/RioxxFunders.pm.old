@@ -1,0 +1,101 @@
+package EPrints::Plugin::Import::RioxxFunders;
+
+use base qw( EPrints::Plugin::Import::DefaultXML );
+
+use strict;
+
+sub new
+{
+	my ($class, %params) = @_;
+
+	my $self = $class->SUPER::new(%params);
+
+	$self->{name} = "RIOXX Funder list";
+	$self->{produce} = [qw( list/funder )];
+
+	return $self;
+}
+
+sub handler_class { __PACKAGE__ . '::Handler' }
+
+sub epdata_to_dataobj
+{
+	my ($self, $dataset, $epdata) = @_;
+
+	$epdata->{database} = 'rioxx';
+
+	# fake a PRIMARY KEY on {name}
+	my $dataobj = $dataset->search(filters => [
+		{ meta_fields => [qw( name )], value => $epdata->{name}, match => 'EX', }
+	])->item(0);
+	if (defined $dataobj)
+	{
+		$dataobj->update($epdata);
+		$epdata = $dataobj->get_data;
+	}
+
+	return $self->SUPER::epdata_to_dataobj($dataset, $epdata);
+}
+
+package EPrints::Plugin::Import::RioxxFunders::Handler;
+
+sub new
+{
+	my ($class, %self) = @_;
+
+	$self{_chars} = \(my $str);
+
+	bless \%self, $class;
+}
+
+sub AUTOLOAD {}
+
+sub start_element
+{
+	my ($self, $data) = @_;
+
+	$self->{path} .= '/' . $data->{LocalName};
+
+	for($self->{path})
+	{
+		if ($_ eq '/rioxx_funder_list/funders/funder')
+		{
+			$self->{epdata} = {};
+		}
+	}
+}
+
+sub end_element
+{
+	my ($self, $data) = @_;
+
+	${$self->{_chars}} =~ s/^\s+|\s$//g;
+
+	for($self->{path})
+	{
+		if ($_ eq '/rioxx_funder_list/funders/funder')
+		{
+			$self->{plugin}->epdata_to_dataobj($self->{dataset}, $self->{epdata});
+		}
+		elsif ($_ eq '/rioxx_funder_list/funders/funder/preferred_name')
+		{
+			$self->{epdata}{name} = ${$self->{_chars}};
+		}
+		elsif ($_ eq '/rioxx_funder_list/funders/funder/alt_name')
+		{
+			push @{$self->{epdata}{alt_name}}, ${$self->{_chars}};
+		}
+	}
+
+	$self->{path} =~ s{/[^/]+$}{};
+	$self->{_chars} = \(my $str);
+}
+
+sub characters
+{
+	my ($self, $data) = @_;
+
+	${$self->{_chars}} .= $data->{Data};
+}
+
+1;

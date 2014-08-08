@@ -1,0 +1,165 @@
+=head1 NAME
+
+EPrints::Plugin::Import::ProjectXML
+
+=head1 DESCRIPTION
+
+Support updating records based on identifiers in the source XML.
+
+=cut
+
+package EPrints::Plugin::Import::ProjectXML;
+
+use strict;
+
+use base qw( EPrints::Plugin::Import::XML );
+
+sub new
+{
+	my( $class, %params ) = @_;
+
+	my $self = $class->SUPER::new(%params);
+
+	$self->{name} = "EPrints Project XML";
+	$self->{visible} = "all";
+	$self->{produce} = [ 'list/project' ];
+	$self->{accept} = [];
+
+	return $self;
+}
+
+sub epdata_to_dataobj
+{
+	my( $self, $dataset, $epdata ) = @_;
+
+	$self->lookup_project_id($dataset, $epdata);
+	$self->lookup_funder_id($dataset, $epdata);
+
+	# bug fix for wrong empty value in Int - empty strings get turned into 0
+	delete $epdata->{funder}{id} if $epdata->{funder} && $epdata->{funder}{id} eq '';
+
+	return $self->SUPER::epdata_to_dataobj($dataset, $epdata);
+}
+
+sub lookup_project_id
+{
+	my ($self, $dataset, $epdata) = @_;
+
+	my $project;
+
+	if (EPrints::Utils::is_set($epdata->{'source'}))
+	{
+		$project = $dataset->search(
+			filters => [
+				{ meta_fields => ['source'], value => $epdata->{'source'}, },
+			],
+		)->item(0);
+	}
+
+	if (!defined $project && EPrints::Utils::is_set($epdata->{'int_project_code'}))
+	{
+		$project = $dataset->search(
+			filters => [
+				{ meta_fields => ['int_project_code'], value => $epdata->{'int_project_code'}, },
+			],
+		)->item(0);
+	}
+
+	if (!defined $project && EPrints::Utils::is_set($epdata->{'grant'}))
+	{
+		$project = $dataset->search(
+			filters => [
+				{ meta_fields => ['grant'], value => $epdata->{'grant'}, match => "EX", },
+			],
+		)->item(0);
+	}
+
+	$epdata->{projectid} = $project->id if defined $project;
+}
+
+sub lookup_funder_id
+{
+	my ($self, $epdataset, $epdata) = @_;
+
+	my $cache = $self->{FUNDER_CACHE} ||= {};
+
+	my $repo = $self->repository;
+	my $funders = $repo->dataset('funder');
+	
+	my $funder;
+
+	if (EPrints::Utils::is_set($epdata->{'int_funder_code'}))
+	{
+		$funder = $cache->{'int_funder_code:'.$epdata->{'int_funder_code'}} ||= $funders->search(
+			filters => [
+				{ meta_fields => ['int_funder_code'], value => $epdata->{'int_funder_code'}, },
+			],
+		)->item(0);
+	}
+
+	my $funder_name = $epdata->{'funder'}{'name'};
+	if ($funder_name eq 'NERC' && $epdata->{'grant'} =~ m{^NE/})
+	{
+		$funder_name = 'Natural Environment Research Council';
+	}
+
+	if (!defined $funder && EPrints::Utils::is_set($funder_name))
+	{
+		$funder = $cache->{'name:'.$funder_name} ||= $funders->search(
+			filters => [
+				{ meta_fields => ['name'], value => $funder_name, match => 'EX', },
+			],
+		)->item(0);
+	}
+
+	if (!defined $funder && EPrints::Utils::is_set($funder_name))
+	{
+		my $results = $cache->{'alt_name:'.$funder_name} ||= $funders->search(
+			filters => [
+				{ meta_fields => ['alt_name'], value => $funder_name, match => 'EX', },
+			],
+		);
+		$funder = $results->item(0) if $results->count == 1;
+	}
+
+	if (defined $funder)
+	{
+		if (!EPrints::Utils::is_set($epdata->{'funder'}{'name'}))
+		{
+			$epdata->{'funder'}{'name'} = $funder->value("name");
+		}
+		if (!EPrints::Utils::is_set($epdata->{'funder'}{'id'}))
+		{
+			$epdata->{'funder'}{'id'} = $funder->id;
+		}
+	}
+}
+1;
+
+=head1 COPYRIGHT
+
+=for COPYRIGHT BEGIN
+
+Copyright 2000-2011 University of Southampton.
+
+=for COPYRIGHT END
+
+=for LICENSE BEGIN
+
+This file is part of EPrints L<http://www.eprints.org/>.
+
+EPrints is free software: you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+EPrints is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with EPrints.  If not, see L<http://www.gnu.org/licenses/>.
+
+=for LICENSE END
+
