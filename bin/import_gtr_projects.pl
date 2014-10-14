@@ -1,4 +1,4 @@
-#!/usr/bin/perl -I/opt/eprints/eprints3/perl_lib
+#!/usr/bin/perl -I/opt/eprints3/perl_lib
 
 # EPrints Services/sf2
 #
