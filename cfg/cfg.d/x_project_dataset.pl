@@ -74,10 +74,86 @@ for(
 				$human = $d.$human if( $d );
 				$display = $human;
 			}
-
-			return $session->make_text( "£$display" );
-		}
+			
+			my $currency_prefix = "£";
+                        my $currency_suffix = "";
+                        if ($session->{lang}->has_phrase("currencies_prefix_default")) {
+  	                     $currency_prefix = $session->phrase("currencies_prefix_default");
+                        }
+                        if ($session->{lang}->has_phrase("currencies_suffix_default")) {
+                              my $currency_suffix = " (" . $session->phrase("currencies_suffix_default") . ")";
+                        }
+                        return $session->make_text( "$currency_prefix$display$currency_suffix" );
+		},
  
+	},
+	{
+		name => "currency_amount",
+		type => "compound",
+		fields => [
+                        {
+				sub_name=>"currency",
+			        type=>"namedset", 
+				set_name=>"currencies",
+				required=>1, 
+				input_rows=>1,
+                        },
+                        {
+                                sub_name => 'major',
+                                type => 'int',
+				input_cols => 5,
+			},
+			{
+				sub_name => 'minor',
+                                type => 'int',
+				render_input => sub {
+					my ( $self, $session, $value, $dataset, $staff, $hidden_fields, $obj, $basename )  = @_;
+                                        if( !defined $value || length($value) == 0 ) { $value = "00"; }
+                                        elsif( length($value) == 1 ) { $value = $value . "0"; }
+					my $input_field = $session->render_input_field(
+						class => "ep_form_text ep_project_currency_amount_minor",
+						name => "c1_currency_amount_minor",
+						value => $value,
+						maxlength => 2,
+						style => "width: 20px;",
+						onkeypress => 'onkeypress="return EPJS_block_enter( event )',
+					);
+					my $frag = $session->make_doc_fragment;
+					$frag->appendChild( $session->make_text(". "));
+					$frag->appendChild( $input_field );
+					return $frag;
+				},
+			},
+		],
+		render_value => sub {
+			my( $session , $field , $value ) = @_;
+
+                        if( !defined $value ) { return $session->make_doc_fragment; }
+			if( $value->{major} =~ /^\d+$/ and length($value->{major}) > 3 )
+                        {
+                        	my $d = $value->{major};
+                                my $human = "";
+                                while( $d =~ s/(\d{3})$// )
+                                {
+                                	$human = ( $d ? ",$1" : "$1" ).$human;
+                                }
+
+                                $human = $d.$human if( $d );
+                                $value->{major} = $human;
+			}
+			
+			if( !defined $value->{minor} || length($value->{minor}) == 0 ) { $value->{minor} = "00"; }
+			elsif( length($value->{minor}) == 1 ) { $value->{minor} = $value->{minor} . "0"; }
+			elsif( length($value->{minor}) > 2 ) {
+				my $rounding = "0.".substr($value->{minor}, 2);
+                       		my $value->{minor} = substr($value->{minor}, 0, 2);
+                               	if ($rounding >= 0.5) { $value->{minor}++; }
+                        }
+		 	my $currency_prefix = $session->phrase("currencies_prefix_".$value->{currency});
+			my $currency_suffix = " (" . $session->phrase("currencies_suffix_".$value->{currency}) . ")";
+                        my $display =  $currency_prefix . $value->{major} . "." . $value->{minor} . $currency_suffix || "";
+                        return $session->make_text($display);
+ 		},	
 	},
 	{
 		# the source URL of that project (eg. gtr's url if imported from gtr)
@@ -231,7 +307,7 @@ $c->add_dataset_trigger( "eprint", EP_TRIGGER_BEFORE_COMMIT, sub {
 
 	# set funders field from project field
 	
-	if( $changed->{projects_id} )
+	if( $changed->{projects_id} || $changed->{funders} )
 	{
 		my $new_projects_id = $dataobj->value( 'projects_id' );
 
@@ -256,6 +332,57 @@ $c->add_dataset_trigger( "eprint", EP_TRIGGER_BEFORE_COMMIT, sub {
 
 } );
 
+$c->add_dataset_trigger( "project", EP_TRIGGER_AFTER_COMMIT, sub {
+
+        my( %p ) = @_;
+
+	# Only run if project has changed
+	return if !defined $p{changed} || !$p{changed};
+
+	my $project = $p{dataobj};
+	my $dataset = $p{repository}->dataset( 'eprint' );
+
+	# Find EPrints associated with a particular project.  
+	# This could get big and it would be good if it could be backgrounded.
+	my $search = $dataset->prepare_search();
+	$search->add_field(
+		fields => [
+			$dataset->field('projects_id')
+		],
+		value => $project->value( 'projectid' ),
+		match => "EQ",
+	);
+	my $eprints = $search->perform_search();
+	
+        $eprints->map( sub {
+		my $eprint = $_[2] or return;
+		my @funders = @{ $project->value( 'funders' ) || [] };
+		# Update funders so before commit EPrint trigger above is run when EPrint is committed
+		$eprint->set_value( "funders", \@funders );
+		$eprint->commit();
+		# Regenerate abstract page
+		$eprint->generate_static();
+	});
+} );			
+
+$c->add_dataset_trigger( "project", EP_TRIGGER_BEFORE_COMMIT, sub {
+
+        my( %p ) = @_;
+
+        my $changed = $p{changed};
+        my $project = $p{dataobj};
+
+        if( $changed->{currency_amount_currency} || $changed->{currency_amount_major} || $changed->{currency_amount_minor} )
+	{
+		my $rounding = "0." . $project->value( 'currency_amount_minor' );
+		if ($rounding >= 0.5) 
+		{ 
+			my $rounded = $project->value( 'currency_amount_major' ) + 1;
+			$project->set_value( "amount", $rounded ); 
+		}
+		else { $project->set_value( "amount", $project->value( 'currency_amount_major' ) ); }
+	}
+} );
 
 # Browse view for Funders/Projects
 push @{$c->{browse_views}}, {

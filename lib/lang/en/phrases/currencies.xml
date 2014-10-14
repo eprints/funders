@@ -1,0 +1,30 @@
+?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE phrases SYSTEM "entities.dtd">
+<epp:phrases xmlns="http://www.w3.org/1999/xhtml" xmlns:epp="http://eprints.org/ep3/phrase" xmlns:epc="http://eprints.org/ep3/control">
+  <epp:phrase id="currencies_prefix_default">£</epp:phrase>
+  <epp:phrase id="currencies_suffix_default"></epp:phrase>
+  <epp:phrase id="currencies_typename_aud">Australian Dollar (AUD$)</epp:phrase>
+  <epp:phrase id="currencies_prefix_aud">$</epp:phrase>
+  <epp:phrase id="currencies_suffix_aud">AUD</epp:phrase>
+  <epp:phrase id="currencies_typename_brl">Brazilian Real (BRL$)</epp:phrase>
+  <epp:phrase id="currencies_prefix_brl">$</epp:phrase>
+  <epp:phrase id="currencies_suffix_brl">BRL</epp:phrase>
+  <epp:phrase id="currencies_typename_cad">Canadian Dollar (CAD$)</epp:phrase>
+  <epp:phrase id="currencies_prefix_cad">$</epp:phrase>
+  <epp:phrase id="currencies_suffix_cad">CAD</epp:phrase>
+  <epp:phrase id="currencies_typename_cny">Chinese Yuan (CNY¥)</epp:phrase>
+  <epp:phrase id="currencies_prefix_cny">¥</epp:phrase>
+  <epp:phrase id="currencies_suffix_cny">CNY</epp:phrase>
+  <epp:phrase id="currencies_typename_eur">Euro (EUR€)</epp:phrase>
+  <epp:phrase id="currencies_prefix_eur">€</epp:phrase>
+  <epp:phrase id="currencies_suffix_eur">EUR</epp:phrase>
+  <epp:phrase id="currencies_typename_gbp">Pounds Sterling (GBP£)</epp:phrase>
+  <epp:phrase id="currencies_prefix_gbp">£</epp:phrase>
+  <epp:phrase id="currencies_suffix_gbp">GBP</epp:phrase>
+  <epp:phrase id="currencies_typename_inr">Indian Rupee (INR)</epp:phrase>
+  <epp:phrase id="currencies_prefix_inr"></epp:phrase>
+  <epp:phrase id="currencies_suffix_inr">INR</epp:phrase>
+  <epp:phrase id="currencies_typename_usd">US Dollar (USD$)</epp:phrase>
+  <epp:phrase id="currencies_prefix_usd">$</epp:phrase>
+  <epp:phrase id="currencies_suffix_usd">USD</epp:phrase>
+</epp:phrases>
