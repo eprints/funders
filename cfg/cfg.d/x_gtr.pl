@@ -24,6 +24,9 @@ $c->{gtr}->{project_to_epdata} = sub
 		date_start => $project->{fund}->{start},
 		date_end => $project->{fund}->{end},
 		amount => $project->{fund}->{valuePounds},
+		currency_amount_currency => "gbp",
+		currency_amount_major => $project->{fund}->{valuePounds},
+		currency_amount_minor => 0,
 		database => 'http://gtr.rcuk.ac.uk/',
 		source => URI->new($project->{url})->canonical->as_string,
 	};
