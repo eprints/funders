@@ -101,7 +101,7 @@ for(
                         {
                                 sub_name => 'major',
                                 type => 'int',
-				input_cols => 5,
+				input_cols => 8,
 			},
 			{
 				sub_name => 'minor',
