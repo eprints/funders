@@ -14,8 +14,10 @@
 <epp:phrase id="funder_fieldname_datestamp">Datestamp</epp:phrase>
 <epp:phrase id="funder_fieldname_name">Name</epp:phrase>
 <epp:phrase id="funder_fieldhelp_name">Primary name for the funder.</epp:phrase>
-<epp:phrase id="funder_fieldname_alt_name">Alternate Names</epp:phrase>
+<epp:phrase id="funder_fieldname_alt_name">Alternate Name(s)</epp:phrase>
 <epp:phrase id="funder_fieldhelp_alt_name">Other names used to describe the funder.</epp:phrase>
+<epp:phrase id="funder_fieldname_alt_name_index">Alternate Name(s)</epp:phrase>
+<epp:phrase id="funder_fieldhelp_alt_name_index">Other names used to describe the funder.</epp:phrase>
 <epp:phrase id="funder_fieldname_open_access_policy">Open Access Policy URL</epp:phrase>
 <epp:phrase id="funder_fieldhelp_open_access_policy">Link to the Open Access policy of the funder.</epp:phrase>
 <epp:phrase id="funder_fieldname_type">Type</epp:phrase>
@@ -27,7 +29,12 @@
 <epp:phrase id="funder_fieldname_userid">Owner</epp:phrase>
 <epp:phrase id="funder_fieldname_identifier">Identifier(s)</epp:phrase>
 <epp:phrase id="funder_fieldhelp_identifier">Unique identifier(s) for the funder.</epp:phrase>
+<epp:phrase id="funder_fieldname_identifier_index">Identifier(s)</epp:phrase>
+<epp:phrase id="funder_fieldhelp_identifier_index">Unique identifier(s) for the funder.</epp:phrase>
 <epp:phrase id="funder_fieldname_parents">Parents</epp:phrase>
+<epp:phrase id="funder_fieldhelp_parents">Parent organisations of the funder.</epp:phrase>
+<epp:phrase id="funder_fieldname_parents_index">Parents</epp:phrase>
+<epp:phrase id="funder_fieldhelp_parents_index">Parent organisations of the funder.</epp:phrase>
 <epp:phrase id="funder_fieldname_geoname_state">State</epp:phrase>
 <epp:phrase id="funder_fieldname_country">Country</epp:phrase>
 <epp:phrase id="funder_fieldname_int_funder_code">Internal Funder Code</epp:phrase>

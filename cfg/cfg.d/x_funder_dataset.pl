@@ -8,6 +8,7 @@ $c->{datasets}->{funder} = {
  	sqlname => "funder",
  	datestamp => "datestamp",
 	index => 1,
+	order => 1,
 };
 
 # fields
@@ -39,6 +40,13 @@ for(
 		name => "alt_name",
 		type => "text",
 		multiple => 1,
+		show_in_fieldlist => 0,
+	},
+	{
+		# index for alternative names for sorting funders
+		name => "alt_name_index",
+		type => "text",
+		show_in_html => 0,
 	},
 	{
 		# source of the import (gtr etc)
@@ -50,6 +58,13 @@ for(
 		name => "identifier",
 		type => "id",
 		multiple => 1,
+		show_in_fieldlist => 0,
+	},
+	{
+		# index for identifiers for sorting funders
+		name => "identifier_index",
+                type => "text",
+		show_in_html => 0,
 	},
 	{
 		name => "database",
@@ -75,6 +90,13 @@ for(
 		name => "parents",
 		type => "id",
 		multiple => 1,
+		show_in_fieldlist => 0,
+	},
+	{
+		# index for parents for sorting funders
+		name => "parents_index",
+                type => "text",
+		show_in_html => 0,
 	},
 	{
 		# the geoname code (i.e a country) - from Fundref
@@ -177,4 +199,32 @@ $c->{datasets}->{funder}->{search}->{dataobjref} = {
                 },
                 default_order => "byid",
 };
+
+
+$c->add_dataset_trigger( "funder", EP_TRIGGER_BEFORE_COMMIT, sub {
+	my( %p ) = @_;
+
+        my $changed = $p{changed};
+        my $dataobj = $p{dataobj};
+
+
+        # Generate alt_name_index for record table ordering
+        if( $changed->{alt_name} )
+	{
+		$dataobj->set_value('alt_name_index', $dataobj->render_value('alt_name')->toString());
+	}
+
+	# Generate identifier_index for record table ordering
+        if( $changed->{identifier} )
+        {
+                $dataobj->set_value('identifier_index', $dataobj->render_value('identifier')->toString());
+        }
+
+	# Generate parents_index for record table ordering
+        if( $changed->{parents} )
+        {
+                $dataobj->set_value('parents_index', $dataobj->render_value('parents')->toString());
+        }
+} );
+
 
