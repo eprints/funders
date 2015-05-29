@@ -12,6 +12,9 @@
   <epp:phrase id="currencies_typename_cad">Canadian Dollar (CAD$)</epp:phrase>
   <epp:phrase id="currencies_prefix_cad">$</epp:phrase>
   <epp:phrase id="currencies_suffix_cad">CAD</epp:phrase>
+  <epp:phrase id="currencies_typename_cad">Swiss Franc (CHF)</epp:phrase>
+  <epp:phrase id="currencies_prefix_cad">SFr</epp:phrase>
+  <epp:phrase id="currencies_suffix_cad"></epp:phrase>
   <epp:phrase id="currencies_typename_cny">Chinese Yuan (CNY¥)</epp:phrase>
   <epp:phrase id="currencies_prefix_cny">¥</epp:phrase>
   <epp:phrase id="currencies_suffix_cny">CNY</epp:phrase>
