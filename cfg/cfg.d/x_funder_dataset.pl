@@ -8,7 +8,6 @@ $c->{datasets}->{funder} = {
  	sqlname => "funder",
  	datestamp => "datestamp",
 	index => 1,
-	order => 1,
 };
 
 # fields

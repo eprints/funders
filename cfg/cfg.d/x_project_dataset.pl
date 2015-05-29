@@ -8,7 +8,6 @@ $c->{datasets}->{project} = {
  	sqlname => "project",
  	datestamp => "datestamp",
 	index => 1,
-	order => 1,
 };
 
 # fields
