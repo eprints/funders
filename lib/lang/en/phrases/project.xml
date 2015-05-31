@@ -72,4 +72,23 @@ You can search by any combination of PI, Co-I, project title grant reference or 
 
 <epp:phrase id="Plugin/Screen/UserGrants:title">Backfill grants</epp:phrase>
 
+<epp:phrase id="lib/epm/funders:eprint_workflow_stage_intro">Please complete the following fields to indicate whether or not the output is associated with a grant.</epp:phrase>
+
+<epp:phrase id="lib/epm/funders:missing_project">Cannot find your project?</epp:phrase>
+
+<epp:phrase id="Plugin/Screen/Grants:filterbyrole:title">Filter by Role - <epc:pin name="rolefilter" /></epp:phrase>
+
+<epp:phrase id="Plugin/Screen/Grants:filterbyrole:choose">
+<div style="margin:10px">
+	<p>Current filter: <strong><epc:pin name="rolefilter" /></strong></p>
+        <p>Choice of filters: <epc:pin name="rolefilterlist" />
+	</p>
+</div>
+
+</epp:phrase>
+
+<epp:phrase id="Plugin/Screen/Grants:filterbyrole:nofilter">Owner or creator</epp:phrase>
+<epp:phrase id="Plugin/Screen/Grants:filterbyrole:owner">Owner</epp:phrase>
+<epp:phrase id="Plugin/Screen/Grants:filterbyrole:creator">Creator</epp:phrase>
+
 </epp:phrases>

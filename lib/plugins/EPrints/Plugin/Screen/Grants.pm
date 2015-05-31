@@ -109,28 +109,47 @@ sub perform_search
 	my @search_fields;
 
 	# search for deposited items by default:
-	push @search_fields, {
-		meta_fields => [qw/ userid /],
-		value => $user->id,
-		match => 'EX'
-	};
+	my $filterbyrole = $self->param( 'filter_by_role' );
+	$filterbyrole ||= 0;
+	my $rolefilter = $self->repository->param('role');
+	$rolefilter ||= "nofilter";
+
+	if ( $filterbyrole == 0 || $rolefilter eq "owner" || $rolefilter eq "nofilter" )
+	{
+		push @search_fields, {
+			meta_fields => [qw/ userid /],
+			value => $user->id,
+			match => 'EX'
+		};
+	}
 
 	# it is however possible to add extra filters (to search via authorid for instance)
 	my %list_filters = %{ $self->param( 'list_filters' ) || {} };
 
 	# "key" is the eprint fieldname, "value" is the user fieldname
-	foreach my $epfield ( keys %list_filters )
+	if ( $filterbyrole == 0 || $rolefilter eq "creator" || $rolefilter eq "nofilter" ) 
 	{
-		my $ufield = $list_filters{$epfield};
-		next if( !defined $ufield || !$user->exists_and_set( $ufield ) );
-
-		push @search_fields, {
-			meta_fields => [ $epfield ],
-			value => $user->value( $ufield ),
-			match => 'EX'
-		};
+		foreach my $epfield ( keys %list_filters )
+		{
+			my $ufield = $list_filters{$epfield};
+			next if( !defined $ufield || !$user->exists_and_set( $ufield ) );	
+			push @search_fields, {
+				meta_fields => [ $epfield ],
+				value => $user->value( $ufield ),
+				match => 'EX'
+			};
+		}
 	}
-	
+
+	# Hack to ensure no results are returned if no filters are set.
+	if ( ! @search_fields )
+	{
+		push @search_fields, {
+                        meta_fields => [qw/ userid /],
+                        value => 0,
+                        match => 'EX'
+                };
+	}
 	$props{search_fields} = \@search_fields;
 
 	$props{custom_order} = $self->param( "custom_order" );
@@ -180,12 +199,11 @@ sub render_top_bar
 	else
 	{
 		return $f if( !$self->allow( 'staff/user_search' ) );
-
 		my $search_link = $session->make_element( 'a', href => $self->{processor}->{url}."?screen=Staff::UserSearch" );
 		$f->appendChild( $self->html_phrase( 'onbehalfof:userquest', search_users => $search_link ) );
 	}
-
-        my %options = (
+        
+	my %options = (
                 session => $session,
                 id => "ep_grants_onbehalfof",
                 title => $self->html_phrase( 'onbehalfof:title' ),
@@ -195,6 +213,46 @@ sub render_top_bar
         my $box = $session->make_element( "div", style=>"text-align: left" );
         $box->appendChild( EPrints::Box::render( %options ) );
         $f->appendChild( $box );
+
+	# DRN: Filter by Role
+	if ( defined $self->param( 'filter_by_role' ) )
+	{
+		my $rolebaseurl = $self->{processor}->{url}."?screen=".$self->{processor}->{screenid};
+		if ( defined $self->repository->param('userid'))
+                {
+                        $rolebaseurl .= "&userid=" . $self->repository->param('userid');
+                }
+	        my $rolefilter = $self->repository->param('role');
+		$rolefilter ||= "nofilter";	
+
+	        my $rolefilterlist = $session->make_element( 'ul' );
+        	my @rolefilters = ( "nofilter", "owner", "creator");
+	        foreach my $rf ( @rolefilters ) {
+        	        my $rflistitem = $session->make_element( 'li' );
+                	my $rflianchor = $session->make_element( 'a',  href => $rolebaseurl . "&role=" . $rf );
+	                $rflianchor->appendChild( $self->html_phrase( 'filterbyrole:' . $rf ) );
+        	        $rflistitem->appendChild( $rflianchor );
+                	$rolefilterlist->appendChild( $rflistitem );
+	        }
+	
+		my $f2 = $xml->create_document_fragment;
+	        $f2->appendChild( $self->html_phrase( 'filterbyrole:choose',
+       	        	rolefilter => $self->html_phrase( 'filterbyrole:' . $rolefilter ),
+                	rolefilterlist => $rolefilterlist
+        	) );
+
+		my %options2 = (
+        	        session => $session,
+                	id => "ep_grants_filterbyrole",
+	                title => $self->html_phrase( 'filterbyrole:title', rolefilter => $self->html_phrase( 'filterbyrole:' . $rolefilter ) ),
+        	        content => $f2,
+                	collapsed => !defined $self->{processor}->{filterbyrole},
+	        );
+		my $box2 = $session->make_element( "div", style=>"text-align: left" );
+        	$box2->appendChild( EPrints::Box::render( %options2 ) );
+        
+		$f->appendChild( $box2 );
+	}
         
         return $f;
 }
@@ -209,6 +267,7 @@ sub render_search_fields
 	# sf2 - added whitelist to restrict the list of fields to filter with (otherwise the list's quite huge)
 	my $whitelist_def = $self->param( "fields_filter_whitelist" );
 	my $do_whitelist = defined $whitelist_def && scalar( @$whitelist_def ) > 0;
+
 
 	my %whitelist_fields = map { $_ => 1 } @{ $whitelist_def || [] };
         
@@ -226,7 +285,8 @@ sub render_search_fields
                                 no_help => ( $sf->{show_help} eq "never" ),
                          ) );
         }
-        
+
+
         return $frag;
 }
 

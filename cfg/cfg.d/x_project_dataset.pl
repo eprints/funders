@@ -437,7 +437,6 @@ $c->{plugins}{'Screen::Grants'}{params}{list_filters} = {
 
 $c->{plugins}{'Screen::Grants'}{params}{fields_filter_whitelist} = [qw/ type date /];
 
-
 # a custom method to decide if the current user is allowed to back-fill Grants on behalf of user "$onbehalf"
 # note that the current user MUST have the "grants" privilege regarless of the returned value of the function below
 # function must return 0 or 1 to deny or allow respectively
@@ -461,6 +460,9 @@ $c->{plugins}{'Screen::Grants'}{params}{allow_on_behalf_of} = sub {
 
 # This is the button on the user profile linking back to the Grants screen 
 $c->{plugins}{'Screen::UserGrants'}{params}{allow_on_behalf_of} = $c->{plugins}{'Screen::Grants'}{params}{allow_on_behalf_of};
+
+# This disables by default filter by role for grants backfill
+$c->{plugins}{'Screen::Grants'}{params}{filter_by_role} = undef;
 
 
 # added staff/user_search, user_view to editors so they can search for users (to backfill grants on behalf of)
