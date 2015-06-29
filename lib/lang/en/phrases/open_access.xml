@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+
+<epp:phrases xmlns="http://www.w3.org/1999/xhtml" xmlns:epp="http://eprints.org/ep3/phrase" xmlns:epc="http://eprints.org/ep3/control">
+
+    <epp:phrase id="open_access_mandate_title">RCUK Open Access mandate for journal articles</epp:phrase>
+    <epp:phrase id="open_access_mandate">
+<p>If this work has been funded in part or wholly by:</p>
+<ul>
+<li>RCUK (<a href="http://www.rcuk.ac.uk/documents/documents/RCUKOpenAccessPolicy.pdf">policy</a> - PDF), and is a <b>journal article</b> being submitted for publication from 1st April 2013,</li>
+</ul>
+<p>You are required to provide an Open Access version of the work either on the publisher website or to upload one in <epc:phrase ref="archive_name"/>.</p>
+<p>Use <a href="http://www.sherpa.ac.uk/fact/">SHERPA/FACT</a> to check the journal's archiving policy and its compliance with your funder's Open Access requirement.</p>
+<dl>
+<dt><epc:phrase ref="archive_name"/> (Green Open Access)</dt>
+<dd>Upload the version that includes peer reviewed corrections. This is usually the author's final manuscript; upload immediately it is accepted for publication so that you comply with the REF. <epc:phrase ref="archive_name"/> staff will set an embargo, or lock access, if required by the journal.</dd>
+<dt>Publisher website (Gold Open Access)</dt>
+<dd>If the Green option is not compliant with RCUK policy, you can choose the Gold option. If the journal charges an Open Access fee (APC), and funding is not available from other sources, you should request funding from the University’s Open Access Fund.</dd>
+</dl>
+</epp:phrase>
+
+    <epp:phrase id="metapage_title_open_access">Open Access</epp:phrase>
+
+</epp:phrases>
