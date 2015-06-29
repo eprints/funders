@@ -8,6 +8,7 @@
 <epp:phrase id="project:workflow:stage:default:title">Details</epp:phrase>
 
 <epp:phrase id="project_fieldname_projectid">Project ID</epp:phrase>
+<epp:phrase id="project_fieldname_userid">Owner</epp:phrase> 
 <epp:phrase id="project_fieldname_datestamp">Datestamp</epp:phrase>
 <epp:phrase id="project_fieldname_title">Project name</epp:phrase>
 <epp:phrase id="project_fieldhelp_title">The name of the project.</epp:phrase>
@@ -50,6 +51,25 @@
 
 <epp:phrase id="eprint_fieldname_projects_import_note">Notes on projects import (for staff)</epp:phrase>
 
+<epp:phrase id="eprint_fieldname_funders_acknowledged">Have you acknowledged funders in this publication?</epp:phrase>
+<epp:phrase id="eprint_fieldhelp_funders_acknowledged">Please <strong> answer for any projects associated with this item,</strong> not just grants awarded at Reading.
+<br></br>
+<br>Most funders (including RCUK) require that work resulting from their grants is acknowledged by including a statement in the paper.</br>
+<br>This is an example suggested by ESRC:</br>
+<br>"This work was supported by the Wellcome Trust [grant numbers xxxx, yyyy]; the Natural Environment Research Council [grant number zzzz]; and the Economic and Social Research Council [grant number aaaa]."</br></epp:phrase>
+<epp:phrase id="eprint_fieldopt_funders_acknowledged_yes">Yes</epp:phrase>
+<epp:phrase id="eprint_fieldopt_funders_acknowledged_no">No</epp:phrase>
+<epp:phrase id="eprint_fieldopt_funders_acknowledged_no_funders">No funders</epp:phrase>
+
+<epp:phrase id="searchfield_name_funders_acknowledged">Acknowledged funder(s)?</epp:phrase>
+
+<epp:phrase id="eprint_fieldname_nofunding">No funders</epp:phrase>
+<epp:phrase id="eprint_fieldhelp_nofunding">Only check this box if you are sure there is no <epc:phrase ref="eprint_fieldname_projects"/> or <epc:phrase ref="eprint_fieldname_funders"/> associated with this item.</epp:phrase>
+<epp:phrase id="validate:need_projects_or_nofunding">If an item does not have any <pin name="fieldname">funders</pin> then it must have the <em><epc:phrase ref="eprint_fieldname_nofunding"/></em> set.</epp:phrase>
+
+<epp:phrase id="eprint_fieldname_unknown_project">Project Information</epp:phrase>
+<epp:phrase id="eprint_fieldhelp_unknown_project">If you cannot find your project in the above auto-completion list, please provide some information to the Library team about your funding project. This is required to submit your new item.</epp:phrase>
+
 <epp:phrase id="Plugin/Screen/Grants:title">Grants (backfill)</epp:phrase>
 <epp:phrase id="Plugin/Screen/Grants:blurb"><div style="margin:5px">Click on [Add] to link your publication to one or more grants/projects.</div></epp:phrase>
 <epp:phrase id="Plugin/InputForm/Component/Field/DataobjRef:projects:modal:blurb">
@@ -75,6 +95,8 @@ You can search by any combination of PI, Co-I, project title grant reference or 
 <epp:phrase id="lib/epm/funders:eprint_workflow_stage_intro">Please complete the following fields to indicate whether or not the output is associated with a grant.</epp:phrase>
 
 <epp:phrase id="lib/epm/funders:missing_project">Cannot find your project?</epp:phrase>
+
+<epp:phrase id="lib/epm/funders:acknowledge_funders">Acknowledge Funders</epp:phrase>
 
 <epp:phrase id="Plugin/Screen/Grants:filterbyrole:title">Filter by Role - <epc:pin name="rolefilter" /></epp:phrase>
 
@@ -102,5 +124,6 @@ You can search by any combination of PI, Co-I, project title grant reference or 
 </div>
 </epp:phrase>
 
+<epp:phrase id="validate:need_projects_or_nofunding">If an item does not have any <pin name="fieldname">funders</pin> then it must have the <em><epc:phrase ref="eprint_fieldname_nofunding"/></em> set.</epp:phrase>
 
 </epp:phrases>

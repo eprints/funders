@@ -454,6 +454,15 @@ $c->add_dataset_field( 'eprint',
 	reuse => 1
 );
 
+# Field to allow users to specify there is no funding behind an EPrint
+$c->add_dataset_field( 'eprint', { name => "nofunding", type => "boolean" } );
+
+# Dield to allow users to describe why they have not added a project or could not find it.
+$c->add_dataset_field( 'eprint', { name => "unknown_project", type => "longtext" } );
+
+# Field to ask users to confim they have acknowledged funders
+$c->add_dataset_field( 'eprint', { name => "funders_acknowledged", type => "set", input_style => "radio", required => 1, options => [ 'yes', 'no', 'no_funders' ] } );
+
 
 # Back-fill screens
 
