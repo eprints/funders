@@ -185,6 +185,9 @@ $c->add_dataset_field( 'eprint',
         reuse => 1
 );
 
+# So old funder values can be retained and used within the web interfaces
+$c->add_dataset_field( 'eprint', { 'name' => 'funders_historical', 'type' => 'text', 'multiple' => 1, 'input_boxes' => 1, } );
+
 # fields to search on the UI
 $c->{datasets}->{funder}->{search}->{dataobjref} = {
                 search_fields => [{
