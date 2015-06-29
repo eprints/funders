@@ -311,9 +311,9 @@ $c->add_dataset_trigger( "eprint", EP_TRIGGER_BEFORE_COMMIT, sub {
 	{
 		my $new_projects_id = $dataobj->value( 'projects_id' );
 
-		my @funders_id;
+		my @projects_titles;
+		my @projects_grants;
 		my @funders;
-
 		EPrints::List->new( 
 			repository => $dataobj->repository,
 			dataset => $dataobj->repository->dataset( 'project' ),
@@ -321,13 +321,25 @@ $c->add_dataset_trigger( "eprint", EP_TRIGGER_BEFORE_COMMIT, sub {
 		)->map( sub {
 			
 			my $project = $_[2] or return;
-
+			
 			# cache the funders to the 'eprint' data-obj
-			@funders = @{ $project->value( 'funders' ) || [] };
-
+			foreach my $funder (@{ $project->value( 'funders' ) || [] }) {
+				push @funders, $funder;
+			}
+			push ( @projects_titles, $project->value( 'title' ) );
+			push ( @projects_grants, $project->value( 'grant' ) );
 		} );		 
-
+			
+		$dataobj->set_value( "projects_title", \@projects_titles );
+		$dataobj->set_value( "projects_grant", \@projects_grants );
 		$dataobj->set_value( "funders", \@funders );
+		my $funder_dataset = $p{repository}->dataset( "funder" );
+		my @funders_names = map { 
+                        my $funder = $funder_dataset->dataobj($_->{id});
+                        $funder->get_value( 'name' ); 
+                } @funders;
+		$dataobj->set_value( "funders_name", \@funders_names );
+		
 	}
 
 } );
@@ -353,12 +365,38 @@ $c->add_dataset_trigger( "project", EP_TRIGGER_AFTER_COMMIT, sub {
 		match => "EQ",
 	);
 	my $eprints = $search->perform_search();
-	
+	my $project_dataset = $p{repository}->dataset( "project" );
+	my $funder_dataset = $p{repository}->dataset( "funder" );
         $eprints->map( sub {
 		my $eprint = $_[2] or return;
+		my @projects = @{ $eprint->value( 'projects' ) || [] };
+		# Update project titles for search
+		if ( $p{changed}->{title} ) {
+			my @projects_titles;
+			@projects_titles = map {
+				my $eprint_project = $project_dataset->dataobj($_->{id});
+                	        $eprint_project->get_value( 'title' );
+			} @projects;
+			$eprint->set_value( "projects_title", \@projects_titles );
+		}
+		# Update project grants for search
+		if ( $p{changed}->{grant} ) {
+                       	my @projects_grants;
+			@projects_grants = map {
+                                my $eprint_project = $project_dataset->dataobj($_);
+                                $eprint_project->get_value( '' );
+                       	} @projects;
+			$eprint->set_value( "project_grants", \@projects_grants );
+                }
+		# Update funders and funders names for search
 		my @funders = @{ $project->value( 'funders' ) || [] };
+		my @funders_names = map {
+			my $funder = $funder_dataset->dataobj($_->{id});
+			$funder->get_value( 'name' );
+		} @funders;
 		# Update funders so before commit EPrint trigger above is run when EPrint is committed
 		$eprint->set_value( "funders", \@funders );
+		$eprint->set_value( "funders_name", \@funders_names );
 		$eprint->commit();
 		# Regenerate abstract page
 		$eprint->generate_static();
@@ -409,7 +447,8 @@ $c->add_dataset_field( 'eprint',
 		datasetid=>"project",
 		multiple => 1,
 		fields => [
-			{ sub_name => 'title', type => 'text' }
+			{ sub_name => 'title', type => 'text' },
+			{ sub_name => 'grant', type => 'text' }
 		],
 	},
 	reuse => 1

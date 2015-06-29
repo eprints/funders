@@ -199,6 +199,42 @@ $c->{datasets}->{funder}->{search}->{dataobjref} = {
                 default_order => "byid",
 };
 
+$c->add_dataset_trigger( "funder", EP_TRIGGER_AFTER_COMMIT, sub {
+
+        my( %f ) = @_;
+
+        # Only run if funder has changed
+        return if !defined $f{changed} || !$f{changed} || !$f{changed}->{name};
+
+        my $funder = $f{dataobj};
+        my $dataset = $f{repository}->dataset( 'eprint' );
+
+        # Find EPrints associated with a particular funder.  
+        # This could get big and it would be good if it could be backgrounded.
+        my $search = $dataset->prepare_search();
+        $search->add_field(
+                fields => [
+                        $dataset->field( 'funders_id' )
+                ],
+                value => $funder->value( 'funderid' ),
+                match => "EQ",
+        );
+        my $eprints = $search->perform_search();
+	my $funder_dataset = $f{repository}->dataset( 'funder' );
+	
+	$eprints->map( sub {
+                my $eprint = $_[2] or return;
+                my @funders_names;
+		@funders_names = map {
+                        my $eprint_funder = $funder_dataset->dataobj($_);
+                        $eprint_funder->get_value( 'name' );
+                }
+                $eprint->set_value( "funders_name", \@funders_names );
+           	$eprint->commit();
+               	# Regenerate abstract page
+               	$eprint->generate_static();
+	});
+} );
 
 $c->add_dataset_trigger( "funder", EP_TRIGGER_BEFORE_COMMIT, sub {
 	my( %p ) = @_;

@@ -46,7 +46,7 @@
 
 <epp:phrase id="eprint_fieldname_projects_id">Project ID</epp:phrase>
 <epp:phrase id="eprint_fieldname_projects_title">Project name</epp:phrase>
-
+<epp:phrase id="eprint_fieldname_projects_grant">Project grant code</epp:phrase>
 
 <epp:phrase id="eprint_fieldname_projects_import_note">Notes on projects import (for staff)</epp:phrase>
 
