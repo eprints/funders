@@ -8,6 +8,8 @@
 <epp:phrase id="eprint_fieldname_funders_id">Funder ID</epp:phrase>
 <epp:phrase id="eprint_fieldname_funders_name">Funder name</epp:phrase>
 
+<epp:phrase id="metapage_title_funding">Funding</epp:phrase>
+
 <epp:phrase id="funder:workflow:stage:default:title">Details</epp:phrase>
 
 <epp:phrase id="funder_fieldname_funderid">Funder ID</epp:phrase>
@@ -39,7 +41,10 @@
 <epp:phrase id="funder_fieldname_country">Country</epp:phrase>
 <epp:phrase id="funder_fieldname_int_funder_code">Internal Funder Code</epp:phrase>
 
-<epp:phrase id="metapage_title_funding">Funding</epp:phrase>
-
+<epp:phrase id="funder_fieldopt_type_gov">Governmental</epp:phrase>
+<epp:phrase id="funder_fieldopt_type_pri">Private</epp:phrase>
+<epp:phrase id="funder_fieldopt_sub_type_rcuk">RCUK</epp:phrase>
+<epp:phrase id="funder_fieldopt_sub_type_eu">EU</epp:phrase>
+<epp:phrase id="funder_fieldopt_sub_type_other">Other</epp:phrase>
 
 </epp:phrases>
