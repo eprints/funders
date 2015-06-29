@@ -91,4 +91,16 @@ You can search by any combination of PI, Co-I, project title grant reference or 
 <epp:phrase id="Plugin/Screen/Grants:filterbyrole:owner">Owner</epp:phrase>
 <epp:phrase id="Plugin/Screen/Grants:filterbyrole:creator">Creator</epp:phrase>
 
+<epp:phrase id="bin/projects_for_eprints_report:mail_subject">Projects for EPrints Report for <epc:phrase ref="archive_name"/></epp:phrase>
+<epp:phrase id="bin/projects_for_eprints_report:mail_body">
+<p><epc:pin name="no_funded_projects_counter"/> item(s) do not have no funding set but also have no projects listed.</p>
+<p><epc:pin name="unknown_projects_counter"/> item(s) have the "<epc:phrase ref="lib/epm/funders:missing_project"/>" filled in.</p>
+<div style="border: solid 1px #99f; padding: 1em">
+<div style="display: none"><hr/></div>
+<epc:pin name="unknown_projects_text"/>
+<div style="display: none"><hr/></div>
+</div>
+</epp:phrase>
+
+
 </epp:phrases>
