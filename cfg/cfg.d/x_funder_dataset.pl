@@ -48,6 +48,14 @@ for(
 		show_in_html => 0,
 	},
 	{
+                # To provide a search field to search on main and alternate funder names
+                name => "all_names",
+                type => "text",
+                multiple => 1,
+                show_in_fieldlist => 0,
+		show_in_html => 0,
+        },
+	{
 		# source of the import (gtr etc)
 		name => "source",
 		type => "url",
@@ -179,14 +187,17 @@ $c->add_dataset_field( 'eprint',
                 datasetid=>"funder",
 		multiple => 1,
                 fields => [
-                        { sub_name => 'name', type => 'text' }
+                        { sub_name => 'name', type => "text" },
                 ],
         },
         reuse => 1
 );
 
 # So old funder values can be retained and used within the web interfaces
-$c->add_dataset_field( 'eprint', { 'name' => 'funders_historical', 'type' => 'text', 'multiple' => 1, 'input_boxes' => 1, } );
+$c->add_dataset_field( 'eprint', { 'name' => 'all_funder_names', 'type' => 'text', 'multiple' => 1, 'input_boxes' => 1, } );
+
+# So old funder values can be retained and used within the web interfaces
+$c->add_dataset_field( 'eprint', { 'name' => 'historical_funders', 'type' => 'text', 'multiple' => 1, 'input_boxes' => 1, } );
 
 # fields to search on the UI
 $c->{datasets}->{funder}->{search}->{dataobjref} = {
@@ -227,12 +238,20 @@ $c->add_dataset_trigger( "funder", EP_TRIGGER_AFTER_COMMIT, sub {
 	
 	$eprints->map( sub {
                 my $eprint = $_[2] or return;
-                my @funders_names;
-		@funders_names = map {
-                        my $eprint_funder = $funder_dataset->dataobj($_);
-                        $eprint_funder->get_value( 'name' );
+		my @funders = @{ $eprint->value( 'funders' ) || [] };
+                my @all_funder_names;
+		my @funders_names;
+                foreach my $a_funder (@funders)
+                {
+                        my $funder = $funder_dataset->dataobj($a_funder->{id});
+                        foreach my $funder_name ( @{$funder->value( 'all_names' )} )
+                        {
+                                push ( @all_funder_names, $funder_name );
+                        }
+			push @funders_names, $funder->value( 'name' );
                 }
-                $eprint->set_value( "funders_name", \@funders_names );
+		$eprint->set_value( "funders_names", \@funders_names );
+                $eprint->set_value( "all_funder_names", \@all_funder_names );
            	$eprint->commit();
                	# Regenerate abstract page
                	$eprint->generate_static();
@@ -240,29 +259,25 @@ $c->add_dataset_trigger( "funder", EP_TRIGGER_AFTER_COMMIT, sub {
 } );
 
 $c->add_dataset_trigger( "funder", EP_TRIGGER_BEFORE_COMMIT, sub {
-	my( %p ) = @_;
+	my( %f ) = @_;
 
-        my $changed = $p{changed};
-        my $dataobj = $p{dataobj};
-
+        my $funder = $f{dataobj};
 
         # Generate alt_name_index for record table ordering
-        if( $changed->{alt_name} )
-	{
-		$dataobj->set_value('alt_name_index', $dataobj->render_value('alt_name')->toString());
-	}
+	$funder->set_value('alt_name_index', $funder->render_value('alt_name')->toString());
 
 	# Generate identifier_index for record table ordering
-        if( $changed->{identifier} )
-        {
-                $dataobj->set_value('identifier_index', $dataobj->render_value('identifier')->toString());
-        }
+        $funder->set_value('identifier_index', $funder->render_value('identifier')->toString());
 
 	# Generate parents_index for record table ordering
-        if( $changed->{parents} )
-        {
-                $dataobj->set_value('parents_index', $dataobj->render_value('parents')->toString());
-        }
+        $funder->set_value('parents_index', $funder->render_value('parents')->toString());
+
+	# Merge main and alternate funders names into single field for searching
+	my @all_names;	
+	push @all_names, $funder->get_value('name');
+	foreach my $alt_name ( @{$funder->get_value('alt_name')} ) 
+	{
+		push @all_names, $alt_name;
+	}
+	$funder->set_value( "all_names", \@all_names );
 } );
-
-

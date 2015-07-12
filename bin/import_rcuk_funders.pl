@@ -3,6 +3,8 @@
 use EPrints;
 use strict;
 
+use Data::Dumper;
+
 my $repo = EPrints->new->repository( $ARGV[0] );
 die "Usage: $0 [repoid]\n" if !defined $repo;
 
@@ -82,7 +84,6 @@ foreach my $name ( keys %RCUK )
 		{
 			$funder->set_value( $_, $epdata->{$_} );
 		}
-		$funder->commit;
 		$action = 'updated';
 	}
 	else
@@ -90,6 +91,15 @@ foreach my $name ( keys %RCUK )
 		$funder = $repo->dataset('funder')->create_dataobj( $epdata );
 		$action = 'created';
 	}
+
+	my @all_names;
+        push @all_names, $funder->get_value('name');
+        foreach my $alt_name ( @{$funder->get_value('alt_name')} )
+        {
+                push @all_names, $alt_name;
+        }
+        $funder->set_value( "all_names", \@all_names );
+	$funder->commit;	
 
 	$repo->log( "$action funder #".$funder->id. "(".$funder->value( 'name' ).")" );
 }
