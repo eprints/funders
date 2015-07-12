@@ -11,12 +11,14 @@
       <title>Project details</title>
       <field ref="title" />
       <field ref="grant"/>
+      <field ref="int_project_code"/>
       <field ref="date_start"/>
       <field ref="date_end"/>
       <field ref="currency_amount"/>
+      <field ref="contributors"/>
     </component>
-	<component type="Field::DataobjRef">
+    <component type="Field::DataobjRef">
       <field ref="funders"/>
-	</component>
+    </component>
   </stage>
 </workflow>

@@ -8,17 +8,21 @@
 
 <div><cite:linkhere><strong><print expr="title"/></strong></cite:linkhere></div>
 <epc:if test="is_set(projectid)">
-<div style="padding-top:5px;">Funded by: <print expr="funders"/> (<print expr="grant"/> - <print expr="amount"/>)</div>
+<div style="padding-top:5px;"><epc:phrase ref="cfg/citations/project/default:funded_by"/>: <print expr="funders"/> (<print expr="grant"/> - <print expr="amount"/>)</div>
 
 <epc:set name='contributors' expr="contributors">
 	<epc:foreach expr="$contributors" iterator="contributor">
 		<epc:if test="$contributor{role} = 'PRINCIPAL_INVESTIGATOR'">
-			<div style="padding-top:5px;">Lead by: <print expr="$contributor{name}{given}"/> <print expr="$contributor{name}{family}"/></div>
+			<div style="padding-top:5px;"><epc:phrase ref="cfg/citations/project/default:PRINCIPAL_INVESTIGATOR"/>: <print expr="$contributor{name}{given}"/> <print expr="$contributor{name}{family}"/></div>
 		</epc:if>
+                <epc:if test="$contributor{role} = 'LOCAL_LEAD_INVESTIGATOR'">
+                        <div style="padding-top:5px;"><epc:phrase ref="cfg/citations/project/default:LOCAL_LEAD_INVESTIGATOR"/>: <print expr="$contributor{name}{given}"/> <print expr="$contributor{name}{family}"/></div>
+                </epc:if>
+		
 	</epc:foreach>
 </epc:set>
 
-<div style="padding-top:5px;"><print expr="date_start"/> to <print expr="date_end"/></div>
+<div style="padding-top:5px;"><print expr="date_start"/> - <print expr="date_end"/></div>
 
 </epc:if>
 
