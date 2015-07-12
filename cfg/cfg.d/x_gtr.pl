@@ -5,6 +5,8 @@
 # Allows to import Project, Grant, Funder data from GtR
 #
 
+use Data::Dumper;
+
 $c->{gtr} = {
 
 	'url' => 'http://gtr.rcuk.ac.uk/',
@@ -102,6 +104,7 @@ $c->{gtr}->{project_to_epdata} = sub
 				datestamp => EPrints::Time::get_iso_timestamp(),
 				type => 'gov',	# only public/gov stuff on GtR?	
 			} );
+
 		}
 
 		if ($funder)
@@ -111,6 +114,14 @@ $c->{gtr}->{project_to_epdata} = sub
 				id => $funder->id,
 			}];
 		}
+
+		my @all_names;
+                push @all_names, $funder->get_value('name');
+                foreach my $alt_name ( @{$funder->get_value('alt_name')} )
+                {
+                        push @all_names, $alt_name;
+                }
+                $funder->set_value( "all_names", \@all_names );
 	}
 
 	my @people;
@@ -140,3 +151,50 @@ $c->{gtr}->{project_to_epdata} = sub
 
 	return $epdata;
 };
+
+$c->{gtr}->{merge_with_local} = sub
+{
+        my ($repo) = @_;
+
+	my $projects = $repo->dataset( "project" );
+
+	my $gtr_search = $projects->prepare_search();
+	$gtr_search->add_field(
+		fields => [
+			$projects->field('database')
+		],
+		value => "http://gtr.rcuk.ac.uk/", #$repo->config( 'gtr', 'url' ),
+		match => "EQ",
+	);
+	my @gtr_projects = $gtr_search->perform_search->get_records();
+	print "Number of GtR projects: ". scalar @gtr_projects."\n";
+
+	my $local_search = $projects->prepare_search();
+	$local_search->add_field(
+		fields => [
+			$projects->field('database')
+		],
+		value => $repo->config( 'gtr', 'local_sources'),
+		match => "IN",
+	);
+	my @local_projects = $local_search->perform_search->get_records();
+	print "Number of local projects: ". scalar @local_projects."\n";
+
+	my %local_grants = ();
+	for(@local_projects)
+	{
+	#	print "local project: ".Dumper(%{$_})."\n";
+		$local_grants{$_->{grant}} = $_;
+	}
+	for(@gtr_projects)
+	{
+		if (defined($local_grants{$_->{grant}}))
+		{
+			print "Local project for: ".$_->{grant}."\n";
+		}
+		else
+		{
+			print "No local project for: ".$_->{grant}."\n";
+		}
+	}
+}

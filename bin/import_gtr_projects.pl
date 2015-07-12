@@ -15,6 +15,8 @@ use URI;
 use Getopt::Long;
 use strict;
 
+use Data::Dumper;
+
 use encoding 'utf8';
 
 my %opt = (
@@ -84,7 +86,7 @@ sub import_from_gtr
 
 		if( !defined $total_pages )
 		{
-			print STDERR "Failed to find the number of pages... no records?\n";
+			warn "Failed to find the number of pages... no records?\n";
 			last;
 		}
 
@@ -140,6 +142,12 @@ sub import_record
 	}
 	else {
 		$dataobj = $dataset->create_dataobj($epdata);
+		if (!defined $dataobj) 
+		{
+			print STDERR "could not create project with following data: ".Dumper($epdata)."\n";
+			exit;
+		}
+		$dataobj->commit; #ensure triggers are run
 		print "Imported project #" . $dataobj->id . "\n";
 	}
 
