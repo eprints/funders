@@ -14,9 +14,9 @@
 <epp:phrase id="project_fieldhelp_title">The name of the project.</epp:phrase>
 <epp:phrase id="project_fieldname_funders">Funder</epp:phrase>
 <epp:phrase id="project_fieldhelp_funders">The funders of the project, (e.g. research councils, companies, etc.)</epp:phrase>
-<epp:phrase id="project_fieldname_funders_name">Name</epp:phrase>
-<epp:phrase id="project_fieldname_funders_id">Id</epp:phrase>
-<epp:phrase id="project_fieldname_grant">Grant Reference</epp:phrase>
+<epp:phrase id="project_fieldname_funders_name">Funder name</epp:phrase>
+<epp:phrase id="project_fieldname_funders_id">Funder ID</epp:phrase>
+<epp:phrase id="project_fieldname_grant">Grant reference</epp:phrase>
 <epp:phrase id="project_fieldhelp_grant">The reference code for the project grant.</epp:phrase>
 <epp:phrase id="project_fieldname_date_start">Start date</epp:phrase>
 <epp:phrase id="project_fieldhelp_date_start">The date the project starts/started.</epp:phrase>
@@ -30,57 +30,56 @@
 <epp:phrase id="project_fieldname_currency_amount_major">Amount</epp:phrase>
 <epp:phrase id="project_fieldname_currency_amount_minor"></epp:phrase>
 <epp:phrase id="project_fieldname_source">Source</epp:phrase>
-<epp:phrase id="project_fieldname_database">Data Source</epp:phrase>
-
-<epp:phrase id="project_fieldname_contributors">People involved</epp:phrase>
-<epp:phrase id="project_fieldname_contributors_role">Role</epp:phrase>
-<epp:phrase id="project_fieldname_contributors_name">Name</epp:phrase>
-<epp:phrase id="project_fieldname_contributors_id">Id</epp:phrase>
-
+<epp:phrase id="project_fieldname_database">Data source</epp:phrase>
 <epp:phrase id="project_fieldname_alt_grants">Alternate Grant Reference(s)</epp:phrase>
 <epp:phrase id="project_fieldname_int_project_code">Internal Project Code</epp:phrase>
+<epp:phrase id="project_fieldhelp_int_project_code">An internal reference code for a project, usually different to the #Grant reference'.</epp:phrase>
 <epp:phrase id="project_fieldname_userid">User ID</epp:phrase>
+<epp:phrase id="project_fieldname_contributors">Project Contributors</epp:phrase>
+<epp:phrase id="project_fieldhelp_contributors">Named contributors to the project, such as the principal investigator (use the role PRINCIPAL_INVESTIGATOR) or a local lead investigator (use role LOCAL_LEAD_INVESTIGATOR).</epp:phrase>
+<epp:phrase id="project_fieldname_contributors_role">Contributor role</epp:phrase>
+<epp:phrase id="project_fieldname_contributors_name">Contributor name</epp:phrase>
+<epp:phrase id="project_fieldname_contributors_id">Contributor ID</epp:phrase>
 
 <epp:phrase id="Plugin/Export/ROS:error:missing">Missing required field <b><epc:pin name="field" /></b>.</epp:phrase>
+
 <epp:phrase id="eprint_fieldname_language">Language</epp:phrase>
 <epp:phrase id="eprint_fieldhelp_language">Primary language of the work or, if this item is a translation, the language it has been translated to.</epp:phrase>
-
 <epp:phrase id="eprint_fieldname_projects_id">Project ID</epp:phrase>
 <epp:phrase id="eprint_fieldname_projects_title">Project name</epp:phrase>
 <epp:phrase id="eprint_fieldname_projects_grant">Project grant code</epp:phrase>
-
+<epp:phrase id="eprint_fieldname_projects_int_project_code">Internal project code</epp:phrase>
+<epp:phrase id="eprint_fieldname_project_contributor_names">Project contributors</epp:phrase>
 <epp:phrase id="eprint_fieldname_projects_import_note">Notes on projects import (for staff)</epp:phrase>
-
-<epp:phrase id="eprint_fieldname_funders_acknowledged">Have you acknowledged funders in this publication?</epp:phrase>
-<epp:phrase id="eprint_fieldhelp_funders_acknowledged">Please <strong> answer for any projects associated with this item,</strong> not just grants awarded at Reading.
+<epp:phrase id="eprint_fieldname_acknowledged_funders">Have you acknowledged funders in this publication?</epp:phrase>
+<epp:phrase id="eprint_fieldhelp_acknowledged_funders">Please <strong> answer for any projects associated with this item,</strong>.
 <br></br>
 <br>Most funders (including RCUK) require that work resulting from their grants is acknowledged by including a statement in the paper.</br>
 <br>This is an example suggested by ESRC:</br>
 <br>"This work was supported by the Wellcome Trust [grant numbers xxxx, yyyy]; the Natural Environment Research Council [grant number zzzz]; and the Economic and Social Research Council [grant number aaaa]."</br></epp:phrase>
-<epp:phrase id="eprint_fieldopt_funders_acknowledged_yes">Yes</epp:phrase>
-<epp:phrase id="eprint_fieldopt_funders_acknowledged_no">No</epp:phrase>
-<epp:phrase id="eprint_fieldopt_funders_acknowledged_no_funders">No funders</epp:phrase>
-
-<epp:phrase id="searchfield_name_funders_acknowledged">Acknowledged funder(s)?</epp:phrase>
-
+<epp:phrase id="eprint_fieldopt_acknowledged_funders_yes">Yes</epp:phrase>
+<epp:phrase id="eprint_fieldopt_acknowledged_funders_no">No</epp:phrase>
+<epp:phrase id="eprint_fieldopt_acknowledged_funders)no_funders">No funders</epp:phrase>
 <epp:phrase id="eprint_fieldname_nofunding">No funders</epp:phrase>
-<epp:phrase id="eprint_fieldhelp_nofunding">Only check this box if you are sure there is no <epc:phrase ref="eprint_fieldname_projects"/> or <epc:phrase ref="eprint_fieldname_funders"/> associated with this item.</epp:phrase>
-<epp:phrase id="validate:need_projects_or_nofunding">If an item does not have any <pin name="fieldname">funders</pin> then it must have the <em><epc:phrase ref="eprint_fieldname_nofunding"/></em> set.</epp:phrase>
-
+<epp:phrase id="eprint_fieldhelp_nofunding">Only check this box if there are no <epc:phrase ref="eprint_fieldname_projects"/> or <epc:phrase ref="eprint_fieldname_funders"/> associated with this item, then move on to the next screen.</epp:phrase>
 <epp:phrase id="eprint_fieldname_unknown_project">Project Information</epp:phrase>
 <epp:phrase id="eprint_fieldhelp_unknown_project">If you cannot find your project in the above auto-completion list, please provide some information to the Library team about your funding project. This is required to submit your new item.</epp:phrase>
+<epp:phrase id="eprint_fieldname_historical_projects">Projects (Historical)</epp:phrase>
+<epp:phrase id="eprint_fieldhelp_historical_projects">Free-text projects submitted prior to installation of Funders plugin.</epp:phrase>
+<epp:phrase id="eprint_fieldname_historical_funders">Funders (Historical)</epp:phrase>
+<epp:phrase id="eprint_fieldhelp_historical_funders">Free-text funders submitted prior to installation of Funders plugin.</epp:phrase>
 
-<epp:phrase id="eprint_fieldname_projects_historical">Projects (Historical)</epp:phrase>
-<epp:phrase id="eprint_fieldhelp_projects_historical">Free-text projects submitted prior to installation of Funders plugin.</epp:phrase>
-<epp:phrase id="eprint_fieldname_funders_historical">Funders (Historical)</epp:phrase>
-<epp:phrase id="eprint_fieldhelp_funders_historical">Free-text funders submitted prior to installation of Funders plugin.</epp:phrase>
+<epp:phrase id="searchfield_name_acknowledged_funders">Acknowledged funder(s)?</epp:phrase>
 
+<epp:phrase id="Plugin/Export/ROS:error:missing">Missing required field <b><epc:pin name="field" /></b>.</epp:phrase>
 <epp:phrase id="Plugin/Screen/Grants:title">Grants (backfill)</epp:phrase>
 <epp:phrase id="Plugin/Screen/Grants:blurb"><div style="margin:5px">Click on [Add] to link your publication to one or more grants/projects.</div></epp:phrase>
 <epp:phrase id="Plugin/InputForm/Component/Field/DataobjRef:projects:modal:blurb">
-<div style="margin:5px;line-height:18px">
-You can search by any combination of PI, Co-I, project title grant reference or funder. If you can't find your grant or have any queries, please contact <a href="mailto:eprints@soton.ac.uk">eprints@soton.ac.uk</a>.
-</div>
+Search by any combination of PI, project title, grant reference, internal project code or funder. 
+<ul>
+  <li>When you have found your project click 'Select' and 'Close' to add it.</li>
+  <li>If you do not get any matches, click 'Close' and complete the 'Cannot find your project?' section.</li>
+</ul>
 </epp:phrase>
 
 <epp:phrase id="Plugin/Screen/Grants:onbehalfof:title">"On-behalf-of" Options</epp:phrase>
@@ -98,24 +97,22 @@ You can search by any combination of PI, Co-I, project title grant reference or 
 <epp:phrase id="Plugin/Screen/UserGrants:title">Backfill grants</epp:phrase>
 
 <epp:phrase id="lib/epm/funders:eprint_workflow_stage_intro">Please complete the following fields to indicate whether or not the output is associated with a grant.</epp:phrase>
-
 <epp:phrase id="lib/epm/funders:missing_project">Cannot find your project?</epp:phrase>
-
 <epp:phrase id="lib/epm/funders:acknowledge_funders">Acknowledge Funders</epp:phrase>
+<epp:phrase id="lib/epm/funders:historical_projects_funders">Project / Funders (Historical)</epp:phrase>
 
-<epp:phrase id="lib/epm/funders:projects_funders_historical">Project / Funders (Historical)</epp:phrase>
+<epp:phrase id="cfg/citations/project/default:funded_by">Funded by</epp:phrase>
+<epp:phrase id="cfg/citations/project/default:PRINCIPAL_INVESTIGATOR">Project Lead</epp:phrase>
+<epp:phrase id="cfg/citations/project/default:LOCAL_LEAD_INVESTIGATOR">Local Lead</epp:phrase>
 
 <epp:phrase id="Plugin/Screen/Grants:filterbyrole:title">Filter by Role - <epc:pin name="rolefilter" /></epp:phrase>
-
 <epp:phrase id="Plugin/Screen/Grants:filterbyrole:choose">
 <div style="margin:10px">
 	<p>Current filter: <strong><epc:pin name="rolefilter" /></strong></p>
         <p>Choice of filters: <epc:pin name="rolefilterlist" />
 	</p>
 </div>
-
 </epp:phrase>
-
 <epp:phrase id="Plugin/Screen/Grants:filterbyrole:nofilter">Owner or creator</epp:phrase>
 <epp:phrase id="Plugin/Screen/Grants:filterbyrole:owner">Owner</epp:phrase>
 <epp:phrase id="Plugin/Screen/Grants:filterbyrole:creator">Creator</epp:phrase>

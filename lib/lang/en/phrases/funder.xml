@@ -5,8 +5,9 @@
 <epp:phrase id="datasetname_funder">Funders</epp:phrase>
 <epp:phrase id="datasethelp_funder">Research councils and other bodies that provide funding for research.</epp:phrase>
 
-<epp:phrase id="eprint_fieldname_funders_id">Funder ID</epp:phrase>
-<epp:phrase id="eprint_fieldname_funders_name">Funder name</epp:phrase>
+<epp:phrase id="eprint_fieldname_funders_id">Funder IDs</epp:phrase>
+<epp:phrase id="eprint_fieldname_funders_name">Funder names</epp:phrase>
+<epp:phrase id="eprint_fieldname_all_funder_names">Funder names</epp:phrase>
 
 <epp:phrase id="metapage_title_funding">Funding</epp:phrase>
 
@@ -43,6 +44,17 @@
 
 <epp:phrase id="funder_fieldopt_type_gov">Governmental</epp:phrase>
 <epp:phrase id="funder_fieldopt_type_pri">Private</epp:phrase>
+<epp:phrase id="funder_fieldopt_sub_type_Federal/National Government">Federal/National Government</epp:phrase>
+<epp:phrase id="funder_fieldopt_sub_type_academic">Academic</epp:phrase>
+<epp:phrase id="funder_fieldopt_sub_type_corporate">Corporate</epp:phrase>
+<epp:phrase id="funder_fieldopt_sub_type_federal">Federal</epp:phrase>
+<epp:phrase id="funder_fieldopt_sub_type_federal/national government">Federal/National Government</epp:phrase>
+<epp:phrase id="funder_fieldopt_sub_type_foundation">Foundation</epp:phrase>
+<epp:phrase id="funder_fieldopt_sub_type_government non-federal">Government (non-federal)</epp:phrase>
+<epp:phrase id="funder_fieldopt_sub_type_international">International</epp:phrase>
+<epp:phrase id="funder_fieldopt_sub_type_other">Other</epp:phrase>
+<epp:phrase id="funder_fieldopt_sub_type_other non-profit">Other (non-profit)</epp:phrase>
+<epp:phrase id="funder_fieldopt_sub_type_professional associations and societies">Professional Associations and Societies</epp:phrase>
 <epp:phrase id="funder_fieldopt_sub_type_rcuk">RCUK</epp:phrase>
 <epp:phrase id="funder_fieldopt_sub_type_eu">EU</epp:phrase>
 <epp:phrase id="funder_fieldopt_sub_type_other">Other</epp:phrase>
