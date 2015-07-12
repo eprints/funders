@@ -1,6 +1,7 @@
 #
 # Project Dataset
 #
+use Data::Dumper;
 
 # dataset
 $c->{datasets}->{project} = {
@@ -165,7 +166,7 @@ for(
 		# gtr, elsevier, rioxx 
 		name => "database",
 		type => "id",
-		text_index => 0,
+		text_index => 1,
 	},
 	{
 		# 'role' should be a namedset (P.I. etc, cf GtR)
@@ -175,8 +176,7 @@ for(
 		fields => [
 			{
 				sub_name => 'role',
-				type => 'text',
-				text_index => 0,
+				type => 'id',
 			},
 			{
 				sub_name => 'name',
@@ -275,7 +275,7 @@ $c->add_dataset_field('project', {
 $c->{datasets}->{project}->{search}->{dataobjref} = {
                 search_fields => [{
                         id => "q",
-                        meta_fields => [qw/ title grant contributors_name funders_name alt_grants /],
+                        meta_fields => [qw/ title grant contributors_name funders_name alt_grants int_project_code /],
                         match => "IN",
                 }],
                 show_zero_results => 1,
@@ -313,7 +313,10 @@ $c->add_dataset_trigger( "eprint", EP_TRIGGER_BEFORE_COMMIT, sub {
 
 		my @projects_titles;
 		my @projects_grants;
+		my @projects_int_project_codes;
+		my %project_contributor_names_hash;
 		my @funders;
+		my %funders_hash;
 		EPrints::List->new( 
 			repository => $dataobj->repository,
 			dataset => $dataobj->repository->dataset( 'project' ),
@@ -322,24 +325,49 @@ $c->add_dataset_trigger( "eprint", EP_TRIGGER_BEFORE_COMMIT, sub {
 			
 			my $project = $_[2] or return;
 			
-			# cache the funders to the 'eprint' data-obj
+			# cache the funders to the 'eprint' data-obj only caching each funder once
 			foreach my $funder (@{ $project->value( 'funders' ) || [] }) {
-				push @funders, $funder;
+				if ( !defined $funders_hash{$funder->{id}} )
+				{
+					push @funders, $funder;
+					$funders_hash{$funder->{id}} = 1;
+				}
 			}
+			foreach my $project_contributor ( @{$project->value( 'contributors_name' )} )
+                        {
+				my $project_contributor_name;
+				$project_contributor_name .= " " . $project_contributor->{honourfic} unless !defined( $project_contributor->{honourfic} );
+				$project_contributor_name .= " " . $project_contributor->{given} unless !defined( $project_contributor->{given} );
+				$project_contributor_name .= " " . $project_contributor->{family} unless !defined( $project_contributor->{family} );
+				$project_contributor_name .= " " . $project_contributor->{lineage} unless !defined( $project_contributor->{lineage} );
+                                $project_contributor_names_hash{$project_contributor_name} = 1;
+                        }
 			push ( @projects_titles, $project->value( 'title' ) );
 			push ( @projects_grants, $project->value( 'grant' ) );
+			push ( @projects_int_project_codes, $project->value( 'int_project_code' ) )
 		} );		 
-			
 		$dataobj->set_value( "projects_title", \@projects_titles );
 		$dataobj->set_value( "projects_grant", \@projects_grants );
-		$dataobj->set_value( "funders", \@funders );
+		$dataobj->set_value( "projects_int_project_code", \@projects_int_project_codes );
+		my @project_contributor_names = ( keys %project_contributor_names_hash );
+		$dataobj->set_value( "project_contributor_names", \@project_contributor_names );
+		$dataobj->set_value( "funders", \@funders);
 		my $funder_dataset = $p{repository}->dataset( "funder" );
-		my @funders_names = map { 
-                        my $funder = $funder_dataset->dataobj($_->{id});
-                        $funder->get_value( 'name' ); 
-                } @funders;
+		my %funders_names_hash;
+		my %all_funder_names_hash;
+		foreach my $a_funder (@funders)
+		{
+			my $funder = $funder_dataset->dataobj($a_funder->{id});
+			$funders_names_hash{$funder->value( 'name' )} = 1;
+		        foreach my $funder_name ( @{$funder->value( 'all_names' )} )
+                	{
+                        	$all_funder_names_hash{$funder_name} = 1;
+                	}
+		}
+		my @funders_names = ( keys %funders_names_hash );
+                my @all_funder_names = ( keys %all_funder_names_hash );
 		$dataobj->set_value( "funders_name", \@funders_names );
-		
+		$dataobj->set_value( "all_funder_names", \@all_funder_names );	
 	}
 
 } );
@@ -369,14 +397,14 @@ $c->add_dataset_trigger( "project", EP_TRIGGER_AFTER_COMMIT, sub {
 	my $funder_dataset = $p{repository}->dataset( "funder" );
         $eprints->map( sub {
 		my $eprint = $_[2] or return;
-		my @projects = @{ $eprint->value( 'projects' ) || [] };
+		my @projects = @{ $eprint->value( 'projects_id' ) || [] };
 		# Update project titles for search
 		if ( $p{changed}->{title} ) {
 			my @projects_titles;
 			@projects_titles = map {
-				my $eprint_project = $project_dataset->dataobj($_->{id});
-                	        $eprint_project->get_value( 'title' );
-			} @projects;
+                                my $eprint_project = $project_dataset->dataobj($_);
+                                $eprint_project->get_value( 'title' );
+                        } @projects;
 			$eprint->set_value( "projects_title", \@projects_titles );
 		}
 		# Update project grants for search
@@ -384,19 +412,57 @@ $c->add_dataset_trigger( "project", EP_TRIGGER_AFTER_COMMIT, sub {
                        	my @projects_grants;
 			@projects_grants = map {
                                 my $eprint_project = $project_dataset->dataobj($_);
-                                $eprint_project->get_value( '' );
+                                $eprint_project->get_value( 'grant' );
                        	} @projects;
-			$eprint->set_value( "project_grants", \@projects_grants );
+			$eprint->set_value( "projects_grant", \@projects_grants );
+                }
+		# Update internal project codes for search
+		if ( $p{changed}->{int_project_code} ) {
+                        my @projects_codes;
+                        @projects_codes = map {
+				my $eprint_project = $project_dataset->dataobj($_);
+                                $eprint_project->get_value( 'int_project_code' );
+                        } @projects;
+                        $eprint->set_value( "projects_int_project_code", \@projects_codes );
+                }
+		# Update project contributors names for search
+                if ( $p{changed}->{contributors_name} ) {
+                        my %project_contributor_names_hash;
+                        foreach my $a_project ( @projects )
+                        {
+				my $eprint_project = $project_dataset->dataobj($a_project);
+                                foreach my $project_contributor ( @{$eprint_project->get_value('contributors_name')} )
+                                {
+					my $project_contributor_name;
+					$project_contributor_name .= " " . $project_contributor->{honourfic} unless !defined( $project_contributor->{honourfic} );
+	                                $project_contributor_name .= " " . $project_contributor->{given} unless !defined( $project_contributor->{given} );
+        	                        $project_contributor_name .= " " . $project_contributor->{family} unless !defined( $project_contributor->{family} );
+                	                $project_contributor_name .= " " . $project_contributor->{lineage} unless !defined( $project_contributor->{lineage} );
+                                	$project_contributor_names_hash{$project_contributor_name} = 1;
+                                }
+                        }
+			my @project_contributor_names = ( keys %project_contributor_names_hash );
+                        $eprint->set_value( "project_contributor_names", \@project_contributor_names );
                 }
 		# Update funders and funders names for search
 		my @funders = @{ $project->value( 'funders' ) || [] };
-		my @funders_names = map {
-			my $funder = $funder_dataset->dataobj($_->{id});
-			$funder->get_value( 'name' );
-		} @funders;
+		my %funders_names_hash;
+                my %all_funder_names_hash;
+                foreach my $a_funder (@funders)
+                {
+                        my $funder = $funder_dataset->dataobj($a_funder->{id});
+                        $funders_names_hash{$funder->value( 'name' )} = 1;
+                        foreach my $funder_name ( @{$funder->value( 'all_names' )} )
+                        {
+                                $all_funder_names_hash{$funder_name} = 1;
+                        }
+                }
 		# Update funders so before commit EPrint trigger above is run when EPrint is committed
+		my @funders_names = ( keys %funders_names_hash );
+                my @all_funder_names = ( keys %all_funder_names_hash );
 		$eprint->set_value( "funders", \@funders );
 		$eprint->set_value( "funders_name", \@funders_names );
+                $eprint->set_value( "all_funder_names", \@all_funder_names );
 		$eprint->commit();
 		# Regenerate abstract page
 		$eprint->generate_static();
@@ -410,16 +476,24 @@ $c->add_dataset_trigger( "project", EP_TRIGGER_BEFORE_COMMIT, sub {
         my $changed = $p{changed};
         my $project = $p{dataobj};
 
-        if( $changed->{currency_amount_currency} || $changed->{currency_amount_major} || $changed->{currency_amount_minor} )
-	{
-		my $rounding = "0." . $project->value( 'currency_amount_minor' );
-		if ($rounding >= 0.5) 
-		{ 
-			my $rounded = $project->value( 'currency_amount_major' ) + 1;
-			$project->set_value( "amount", $rounded ); 
-		}
-		else { $project->set_value( "amount", $project->value( 'currency_amount_major' ) ); }
+	# Automatically fill in amount fiels using currentcy_amount compound field
+	my $rounding = "0." . $project->value( 'currency_amount_minor' );
+	if ($rounding >= 0.5) 
+	{ 
+		my $rounded = $project->value( 'currency_amount_major' ) + 1;
+		$project->set_value( "amount", $rounded ); 
 	}
+	else { $project->set_value( "amount", $project->value( 'currency_amount_major' ) ); }
+
+ 	my $funder_dataset = $p{repository}->dataset( "funder" );
+        my @funders;
+        foreach my $a_funder ( @{ $project->value( 'funders' ) } )
+        {
+        	my $funder = $funder_dataset->dataobj($a_funder->{id});
+		push @funders, { 'id' => $a_funder->{id}, 'name' => $funder->get_value('name') };
+	}
+	$project->set_value( "funders", \@funders );
+	
 } );
 
 # Browse view for Funders/Projects
@@ -448,23 +522,27 @@ $c->add_dataset_field( 'eprint',
 		multiple => 1,
 		fields => [
 			{ sub_name => 'title', type => 'text' },
-			{ sub_name => 'grant', type => 'text' }
+			{ sub_name => 'grant', type => 'text' },
+                        { sub_name => 'int_project_code', type => 'text' },
 		],
 	},
 	reuse => 1
 );
 
+# for indexing project contributor names against EPrints for search
+$c->add_dataset_field( 'eprint', { name => "project_contributor_names",  type => 'text', multiple => 1, } );
+
 # Field to allow users to specify there is no funding behind an EPrint
 $c->add_dataset_field( 'eprint', { name => "nofunding", type => "boolean" } );
 
-# Dield to allow users to describe why they have not added a project or could not find it.
+# Field to allow users to describe why they have not added a project or could not find it.
 $c->add_dataset_field( 'eprint', { name => "unknown_project", type => "longtext" } );
 
 # Field to ask users to confim they have acknowledged funders
-$c->add_dataset_field( 'eprint', { name => "funders_acknowledged", type => "set", input_style => "radio", required => 1, options => [ 'yes', 'no', 'no_funders' ] } );
+$c->add_dataset_field( 'eprint', { name => "acknowledged_funders", type => "set", input_style => "radio", required => 1, options => [ 'yes', 'no', 'no_funders' ] } );
 
 # So old project values can be retained and used within the web interfaces
-$c->add_dataset_field( 'eprint', { 'name' => 'projects_historical', 'type' => 'text', 'multiple' => 1, 'input_boxes' => 1, } );
+$c->add_dataset_field( 'eprint', { 'name' => 'historical_projects', 'type' => 'text', 'multiple' => 1, 'input_boxes' => 1, } );
 
 # Back-fill screens
 
