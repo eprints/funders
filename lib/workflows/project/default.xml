@@ -12,6 +12,7 @@
       <field ref="title" />
       <field ref="grant"/>
       <field ref="int_project_code"/>
+      <field ref="source"/>
       <field ref="date_start"/>
       <field ref="date_end"/>
       <field ref="currency_amount"/>
