@@ -6,12 +6,16 @@
 #
 
 use Data::Dumper;
+use Text::Fuzzy;
 
 $c->{aam}->{primary_funder_database} = "http://www.crossref.org/fundref/";
 
 $c->{aam}->{honorifics} = \( 'dr', 'miss', 'mr', 'mrs', 'ms', 'prof' );
 
 $c->{aam}->{funder_mappings} = {};
+
+# The Levenshtein distance at which difference is funder name text strings is considered too high
+$c->{aam}->{fuzzy_difference} = 20;
 
 $c->{aam}->{project_to_epdata} = sub
 {
@@ -50,7 +54,6 @@ $c->{aam}->{project_to_epdata} = sub
 		my $funder_name = $project->{"First Funder Name"};
 		$epdata->{funder_name} = [$funder_name];
 		my $dataset = $repo->dataset('funder');
-		my $funder;
 
 		# Find funder by name
 		my $old_funder_name = "UNSET";
@@ -59,32 +62,57 @@ $c->{aam}->{project_to_epdata} = sub
 			$old_funder_name = $funder_name;
 			$funder_name = $c->{aam}->{funder_mappings}{$funder_name};
 		}
-		$funder = $dataset->search(filters => [
-			{ meta_fields => [qw( all_names )], value => $funder_name, },
-			{ meta_fields => [qw( database )], value => $c->{aam}->{primary_funder_database}, },
-		])->item(0);
+		my $funders = $dataset->search(filters => [
+                        { meta_fields => [qw( all_names )], value => $funder_name },
+                ]);
 
-		if( !defined $funder )
-                {
-			warn "Could not find funder '$funder_name' under ".$c->{aam}->{primary_funder_database}." for project '".$project->{"Project Title"}."'\n";
-			$funder = $dataset->search(filters => [
-	                       { meta_fields => [qw( all_names )], value => $funder_name, },
-                	])->item(0);
+		my $bestfunder = undef;
+		my $bestdistance = $c->{aam}->{fuzzy_difference};
+                my $tf = Text::Fuzzy->new($funder_name);
+		if ( $funders->count > 0 )
+        	{
+                	for (my $f = 0; $f < $funders->count; $f++)
+                	{
+                        	my $a_funder = $funders->item($f);
+                        	foreach my $a_funder_name (@{$a_funder->value('all_names')})
+                        	{
+                                	my $distance = $tf->distance($a_funder_name);
+	                                if ($distance < $bestdistance)
+        	                        {
+                	                        $bestdistance = $distance;
+                        	                $bestfunder = $a_funder;
+                                	        if ( $a_funder_name ne $a_funder->value('name') )
+                                        	{
+                                                	$bestdistance++;
+                                        	}
+						my $a_funder_db = $a_funder->value('database');
+						if ( !defined $a_funder_db || $a_funder_db ne $c->{aam}->{primary_funder_database} )
+                                                {
+                                                        $bestdistance++;
+                                                }	
+                                        	last unless $bestdistance > 0;
+                                	}
+                        	}
+                        	last unless $bestdistance > 0;
+                	}
+			
 		}
-
-		if( !defined $funder )
-		{
-			warn "Could not find funder '$funder_name' at all for project '".$project->{"Project Title"}."'\n";
+		
+		# There was no good match for funder
+		if( !defined $bestfunder )
+                {
+			warn "Could not find suitable match for funder '$funder_name' for project '".$project->{"Project Title"}."'";
 		}
 		else
 		{
+			# There was a good match lets use that
 			$epdata->{funders} = [{
-				name => $funder_name,
-				all_names => [ $funder_name ],
-				id => $funder->id,
+				name => $bestfunder->value('name'),
+				all_names => [@{$bestfunder->value('all_names')}],
+				id => $bestfunder->id,
 			}];
 		}
-	}
+	}	
 	else
 	{
 		warn "No funder name for project '".$project->{"Project Title"}."'\n";
