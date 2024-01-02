@@ -90,6 +90,7 @@ sub parse_aam_csv
         	else 
 		{
                 	warn "Line could not be parsed: $line\n";
+			warn "Error: ".$csv->error_diag()."\n";
         	}
 	}
 	return @rows;
@@ -118,10 +119,12 @@ sub import_record
 	)->item(0);
 
 	if (defined $dataobj) {
+		my @project_contributors = $epdata->{contributors}[0];
 		foreach my $existing_contributor ( @{$dataobj->get_value('contributors')} ) 
 		{
-			push $epdata->{contributors}, $existing_contributor;
+			push @project_contributors, $existing_contributor;
 		}
+		$epdata->{contributors} = \@project_contributors;
 		my $existing_project_title =  $dataobj->get_value('title');
 		if ( ! $epdata->{title} eq $existing_project_title ) 
 		{
@@ -136,7 +139,6 @@ sub import_record
 		$dataobj->commit; # ensure triggers are run
 		print "Imported project #" . $dataobj->id . "\n";
 	}
-
 }
 
 
