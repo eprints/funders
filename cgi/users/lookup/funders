@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+
+use EPrints;
+use JSON;
+use encoding 'utf8';
+
+my $repo = EPrints->new->current_repository;
+
+my( $search ) = $repo->plugins({
+                dataset => $repo->dataset('funder'),
+                limit => 5,
+        },
+        type => 'Search',
+        can_search => 'simple/funder',
+);
+
+my $q = $repo->param('q');
+$q .= '*' if length($q) > 2 && $q !~ /\s/;
+$repo->get_query->param(-name => 'q', -value => $q);
+
+$search->from_form;
+
+my $xml = $repo->xml;
+my $ul = $xml->create_element('ul');
+
+$search->execute->map(sub {
+        (undef, undef, my $funder) = @_;
+
+        $ul->appendChild(my $li = $xml->create_element('li'));
+        $li->appendChild($funder->render_citation);
+        $li->appendChild(my $_ul = $xml->create_element('ul'));
+        $_ul->appendChild(my $_li = $xml->create_element('li', id => 'for:value:relative'));
+        $_li->appendChild($xml->create_text_node($funder->value('name')));
+});
+
+$repo->send_http_header(content_type => 'text/html; charset=UTF-8');
+print $repo->xhtml->to_xhtml($ul);
