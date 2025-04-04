@@ -317,4 +317,20 @@ sub hidden_bits
 	);
 }
 
+sub action_stop
+{
+        my( $self ) = @_;
+
+        my $return_to = $self->repository->param('return_to');
+
+        if ($return_to && $return_to !~ m/Grant/)
+        {
+                $self->{processor}->{screenid} = $return_to;
+        }
+        else
+        {
+                $self->{processor}->{screenid} = $self->view_screen;
+        }
+}
+
 1;

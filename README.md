@@ -1,6 +1,8 @@
 funders
 =======
 
+***Now Implemented as an EPrinst 3.4 ingredient rather than an EPM.***
+
 Modelling and capture of funders and projects into EPrints. This was initially developed for ROS submissions in the UK but should be usable on other contexts.
 
 This contains:
