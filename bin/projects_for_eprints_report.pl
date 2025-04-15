@@ -141,7 +141,7 @@ my $searchexp = new EPrints::Search(
 		session=>$session, 
 		dataset=>$ds );
 
-my $date = sprintf("-%04d-%02d-%02d", EPrints::Time::utc_datetime() );
+my $date = sprintf("-%04d-%02d-%02d", (EPrints::Time::utc_datetime())[0..2] );
 $searchexp->add_field(
         fields => [ 
 		$ds->field('eprint_status'),
